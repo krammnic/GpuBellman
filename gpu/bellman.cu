@@ -45,12 +45,12 @@ int runBellmanFordOnGPU(const char *file, int blockSize, int debug) {
     loadVector((inputFile + "_E.csv").c_str(), E);
     loadVector((inputFile + "_W.csv").c_str(), W);
 
-    if(DEBUG){
-        cout << "V = "; printVector(V); cout << endl;
-        cout << "I = "; printVector(I); cout << endl;
-        cout << "E = "; printVector(E); cout << endl;
-        cout << "W = "; printVector(W); cout << endl;
-    }
+//    if(DEBUG){
+//        cout << "V = "; printVector(V); cout << endl;
+//        cout << "I = "; printVector(I); cout << endl;
+//        cout << "E = "; printVector(E); cout << endl;
+//        cout << "W = "; printVector(W); cout << endl;
+//    }
 
     //output. Rewrite this part with Cuda kernel
     //std::vector<int> D(V.size(), MAX_VAL); //Shortest path of V[i] from source
@@ -64,7 +64,7 @@ int runBellmanFordOnGPU(const char *file, int blockSize, int debug) {
     int BLOCKS = 1;
     BLOCKS = (N + BLOCK_SIZE - 1) / BLOCK_SIZE;
     printCudaDevice();
-    cout << "Blocks : " << BLOCKS << " Block size : " << BLOCK_SIZE << endl;
+//    cout << "Blocks : " << BLOCKS << " Block size : " << BLOCK_SIZE << endl;
 
     int *d_in_V;
     int *d_in_I;
@@ -105,7 +105,7 @@ int runBellmanFordOnGPU(const char *file, int blockSize, int debug) {
     // Bellman ford
     for (int round = 1; round < V.size(); round++) {
         if(DEBUG){
-            cout<< "***** round = " << round << " ******* " << endl;
+//            cout<< "***** round = " << round << " ******* " << endl;
         }
         relax<<<BLOCKS, BLOCK_SIZE>>>(N, MAX_VAL, d_in_V, d_in_I, d_in_E, d_in_W, d_out_D, d_out_Di);
         updateDistance<<<BLOCKS, BLOCK_SIZE>>>(V.size(), d_in_V, d_in_I, d_in_E, d_in_W, d_out_D, d_out_Di);
@@ -124,13 +124,13 @@ int runBellmanFordOnGPU(const char *file, int blockSize, int debug) {
     cudaMemcpy(out_path, d_out_D, V.size()*sizeof(int), cudaMemcpyDeviceToHost);
     cudaMemcpy(out_pred, d_out_P, V.size()*sizeof(int), cudaMemcpyDeviceToHost);
 
-    if(DEBUG) {
-        cout << "Shortest Path : " << endl;
-        for (int i = 0; i < V.size(); i++) {
-            cout << "from " << V[0] << " to " << V[i] << " = " << out_path[i] << " predecessor = " << out_pred[i]
-                 << std::endl;
-        }
-    }
+//    if(DEBUG) {
+//        cout << "Shortest Path : " << endl;
+//        for (int i = 0; i < V.size(); i++) {
+//            cout << "from " << V[0] << " to " << V[i] << " = " << out_path[i] << " predecessor = " << out_pred[i]
+//                 << std::endl;
+//        }
+//    }
 
     // Create output file name by parsing the input filename and extracting the last string :
     std::string delimiter = "/";
@@ -140,7 +140,8 @@ int runBellmanFordOnGPU(const char *file, int blockSize, int debug) {
         token = inputFile.substr(0, pos);
         inputFile.erase(0, pos + delimiter.length());
     }
-    storeResult(("../output/" + inputFile + "_SP_cuda.csv").c_str(),V, out_path, out_pred);
+    storeResult(("output/" + inputFile + "_SP_cuda.csv").c_str(),V, out_path, out_pred);
+//    storeResult(("../output/" + inputFile + "_SP_cuda.csv").c_str(),V, out_path, out_pred);
     cout << "Results written to " << ("../output/" + inputFile + "_SP_cuda.csv").c_str() << endl;
     cout << "** average time elapsed : " << elapsedTime << " milli seconds** " << endl;
 
@@ -177,12 +178,12 @@ int runBellmanFordOnGPUWithGridStride(const char *file, int blocks, int blockSiz
     loadVector((inputFile + "_E.csv").c_str(), E);
     loadVector((inputFile + "_W.csv").c_str(), W);
 
-    if(DEBUG){
-        cout << "V = "; printVector(V); cout << endl;
-        cout << "I = "; printVector(I); cout << endl;
-        cout << "E = "; printVector(E); cout << endl;
-        cout << "W = "; printVector(W); cout << endl;
-    }
+//    if(DEBUG){
+//        cout << "V = "; printVector(V); cout << endl;
+//        cout << "I = "; printVector(I); cout << endl;
+//        cout << "E = "; printVector(E); cout << endl;
+//        cout << "W = "; printVector(W); cout << endl;
+//    }
 
     int N = I.size();
     printCudaDevice();
@@ -224,9 +225,9 @@ int runBellmanFordOnGPUWithGridStride(const char *file, int blocks, int blockSiz
 
     // Bellman ford
     for (int round = 1; round < V.size(); round++) {
-        if(DEBUG){
-            cout<< "***** round = " << round << " ******* " << endl;
-        }
+//        if(DEBUG){
+//            cout<< "***** round = " << round << " ******* " << endl;
+//        }
         relaxWithGridStride<<<BLOCKS, BLOCK_SIZE>>>(N, MAX_VAL, d_in_V, d_in_I, d_in_E, d_in_W, d_out_D, d_out_Di);
         updateDistanceWithGridStride<<<BLOCKS, BLOCK_SIZE>>>(V.size(), d_in_V, d_in_I, d_in_E, d_in_W, d_out_D, d_out_Di);
     }
@@ -244,13 +245,13 @@ int runBellmanFordOnGPUWithGridStride(const char *file, int blocks, int blockSiz
     cudaMemcpy(out_path, d_out_D, V.size()*sizeof(int), cudaMemcpyDeviceToHost);
     cudaMemcpy(out_pred, d_out_P, V.size()*sizeof(int), cudaMemcpyDeviceToHost);
 
-    if(DEBUG) {
-        cout << "Shortest Path : " << endl;
-        for (int i = 0; i < V.size(); i++) {
-            cout << "from " << V[0] << " to " << V[i] << " = " << out_path[i] << " predecessor = " << out_pred[i]
-                 << std::endl;
-        }
-    }
+//    if(DEBUG) {
+//        cout << "Shortest Path : " << endl;
+//        for (int i = 0; i < V.size(); i++) {
+//            cout << "from " << V[0] << " to " << V[i] << " = " << out_path[i] << " predecessor = " << out_pred[i]
+//                 << std::endl;
+//        }
+//    }
 
     // Create output file name by parsing the input filename and extracting the last string :
     std::string delimiter = "/";
@@ -260,7 +261,9 @@ int runBellmanFordOnGPUWithGridStride(const char *file, int blocks, int blockSiz
         token = inputFile.substr(0, pos);
         inputFile.erase(0, pos + delimiter.length());
     }
-    storeResult(("../output/" + inputFile + "_SP_cuda_stride.csv").c_str(),V, out_path, out_pred);
+    storeResult(("output/" + inputFile + "_SP_cuda_stride.csv").c_str(),V, out_path, out_pred);
+//    storeResult(("../output/" + inputFile + "_SP_cuda_stride.csv").c_str(),V, out_path, out_pred);
+    cout << out_pred << endl;
     cout << "Results written to " << ("../output/" + inputFile + "_SP_cuda_stride.csv").c_str() << endl;
     cout << "** average time elapsed : " << elapsedTime << " milli seconds** " << endl;
 
@@ -299,16 +302,16 @@ int runBellmanFordOnGPUV3(const char *file, int blocks, int blockSize, int debug
     loadVector((inputFile + "_E.csv").c_str(), E);
     loadVector((inputFile + "_W.csv").c_str(), W);
 
-    if(DEBUG){
-        cout << "V = "; printVector(V); cout << endl;
-        cout << "I = "; printVector(I); cout << endl;
-        cout << "E = "; printVector(E); cout << endl;
-        cout << "W = "; printVector(W); cout << endl;
-    }
+//    if(DEBUG){
+//        cout << "V = "; printVector(V); cout << endl;
+//        cout << "I = "; printVector(I); cout << endl;
+//        cout << "E = "; printVector(E); cout << endl;
+//        cout << "W = "; printVector(W); cout << endl;
+//    }
 
     int N = I.size();
     printCudaDevice();
-    cout << "Blocks : " << BLOCKS << " Block size : " << BLOCK_SIZE << endl;
+//    cout << "Blocks : " << BLOCKS << " Block size : " << BLOCK_SIZE << endl;
 
     int *d_in_V;
     int *d_in_I;
@@ -349,9 +352,9 @@ int runBellmanFordOnGPUV3(const char *file, int blocks, int blockSize, int debug
 
     // Bellman ford
     for (int round = 1; round < V.size(); round++) {
-        if(DEBUG){
-            cout<< "***** round = " << round << " ******* " << endl;
-        }
+//        if(DEBUG){
+//            cout<< "***** round = " << round << " ******* " << endl;
+//        }
         relaxWithGridStrideV3<<<BLOCKS, BLOCK_SIZE>>>(N, MAX_VAL, d_in_V, d_in_I, d_in_E, d_in_W, d_out_D, d_out_Di, d_Flag);
         updateDistanceWithGridStrideV3<<<BLOCKS, BLOCK_SIZE>>>(V.size(), d_in_V, d_in_I, d_in_E, d_in_W, d_out_D, d_out_Di, d_Flag);
     }
@@ -369,13 +372,13 @@ int runBellmanFordOnGPUV3(const char *file, int blocks, int blockSize, int debug
     cudaMemcpy(out_path, d_out_D, V.size()*sizeof(int), cudaMemcpyDeviceToHost);
     cudaMemcpy(out_pred, d_out_P, V.size()*sizeof(int), cudaMemcpyDeviceToHost);
 
-    if(DEBUG) {
-        cout << "Shortest Path : " << endl;
-        for (int i = 0; i < V.size(); i++) {
-            cout << "from " << V[0] << " to " << V[i] << " = " << out_path[i] << " predecessor = " << out_pred[i]
-                 << std::endl;
-        }
-    }
+//    if(DEBUG) {
+//        cout << "Shortest Path : " << endl;
+//        for (int i = 0; i < V.size(); i++) {
+//            cout << "from " << V[0] << " to " << V[i] << " = " << out_path[i] << " predecessor = " << out_pred[i]
+//                 << std::endl;
+//        }
+//    }
 
     // Create output file name by parsing the input filename and extracting the last string :
     std::string delimiter = "/";
@@ -385,7 +388,8 @@ int runBellmanFordOnGPUV3(const char *file, int blocks, int blockSize, int debug
         token = inputFile.substr(0, pos);
         inputFile.erase(0, pos + delimiter.length());
     }
-    storeResult(("../output/" + inputFile + "_SP_cuda_stride_v3.csv").c_str(),V, out_path, out_pred);
+//    storeResult(("../output/" + inputFile + "_SP_cuda_stride_v3.csv").c_str(),V, out_path, out_pred);
+//    storeResult(("output/" + inputFile + "_SP_cuda_stride_v3.csv").c_str(),V, out_path, out_pred);
     cout << "Results written to " << ("../output/" + inputFile + "_SP_cuda_stride_v3.csv").c_str() << endl;
     cout << "** average time elapsed : " << elapsedTime << " milli seconds** " << endl;
 
