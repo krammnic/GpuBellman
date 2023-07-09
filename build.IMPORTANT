@@ -1,0 +1,1 @@
+cmake ../. -B build -DCMAKE_CUDA_COMPILER=/opt/cuda/bin/nvcc -DTCNN_CUDA_ARCHITECTURES=61
